@@ -2,14 +2,15 @@
 <html>
 
 <head>
-<title>Make - PiStream</title>
+<title>Pi Camera Stream</title>
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css') }}">
 </head>
 
 
 <body>
 
 <div class="main" id="newpost">
-  <p>This is {{ video_feed }}</p>
+  <p>{{ video_feed }}</p>
 	
 </div>
 

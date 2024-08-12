@@ -48,7 +48,9 @@ def generate_frames():
 
 @app.route('/')
 def video_feed():
-    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return render_template('index.html', video_feed="123")
+
+    #return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/video_feed')
 def page_video():
