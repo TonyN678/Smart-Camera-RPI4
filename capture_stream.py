@@ -13,6 +13,7 @@ boxColor=(0,0,255)      #BGR- GREEN
 nameColor=(255,255,255) #BGR- WHITE
 confColor=(255,255,0)   #BGR- TEAL
 face_detector=cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+face_detect = False
 
 app = Flask(__name__)
 
@@ -34,6 +35,8 @@ def generate_frames():
             #maxSize=(30, 30) # Maximum possible object size. Objects larger than this size are ignored.
         )
 
+	face_detect = len(faces) > 0
+	print(face_detect)
 
         for (x, y, w, h) in faces:
             # Create a bounding box across the detected face
@@ -48,9 +51,8 @@ def generate_frames():
 
 @app.route('/')
 def video_feed():
-    return render_template('index.html', video_feed="123")
+    return render_template('index.html', video_feed=Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame'))
 
-    #return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/video_feed')
 def page_video():
