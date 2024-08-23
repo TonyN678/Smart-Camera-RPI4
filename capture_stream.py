@@ -4,16 +4,15 @@ import cv2
 from libcamera import Transform
 import numpy as np
 
-
-#Parameters
+# Parameters
 id = 0
 font = cv2.FONT_HERSHEY_COMPLEX
-height=1
-boxColor=(0,0,255)      #BGR- GREEN
-nameColor=(255,255,255) #BGR- WHITE
-confColor=(255,255,0)   #BGR- TEAL
-face_detector=cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-face_detect = False
+height = 1
+boxColor = (0, 0, 255)      # BGR - RED
+nameColor = (255, 255, 255) # BGR - WHITE
+confColor = (255, 255, 0)   # BGR - TEAL
+face_detector = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+face_detect = 0
 
 app = Flask(__name__)
 
@@ -28,21 +27,27 @@ def generate_frames():
         frameGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # Create a DS faces- array with 4 elements- x,y coordinates top-left corner), width and height
         faces = face_detector.detectMultiScale(
-            frameGray,      # The grayscale frame to detect
-            scaleFactor=1.10,# How much the image size is reduced at each image scale-10% reduction
-            minNeighbors=4, # How many neighbors each candidate rectangle should have to retain it
-            minSize=(40, 40) # Minimum possible object size. Objects smaller than this size are ignored.
-            #maxSize=(30, 30) # Maximum possible object size. Objects larger than this size are ignored.
+            frameGray,       # The grayscale frame to detect
+            scaleFactor=1.10, # How much the image size is reduced at each image scale-10% reduction
+            minNeighbors=4,   # How many neighbors each candidate rectangle should have to retain it
+            minSize=(40, 40)  # Minimum possible object size. Objects smaller than this size are ignored.
+            # maxSize=(30, 30) # Maximum possible object size. Objects larger than this size are ignored.
         )
 
-	face_detect = len(faces) > 0
-	print(face_detect)
+        if len(faces) > 0:
+            face_detect += 1
+        else:
+            face_detect = 0
+        print(face_detect)
+        
+        if face_detect >= 3:
+            print("Face detected!")
 
         for (x, y, w, h) in faces:
             # Create a bounding box across the detected face
             cv2.rectangle(frame, (x, y), (x + w, y + h), boxColor, 3) # 5 parameters - frame, topleftcoords, bottomrightcoords, boxcolor, thickness
         
-	# Encode frame as JPEG
+        # Encode frame as JPEG
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
         # Use yield to create a generator
@@ -51,11 +56,12 @@ def generate_frames():
 
 @app.route('/')
 def video_feed():
-    return render_template('index.html', video_feed=Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame'))
-
+    return render_template('index.html')
 
 @app.route('/video_feed')
 def page_video():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+

@@ -9,14 +9,15 @@
 
 <body>
 
-<div class="main" id="newpost">
-  <p>{{ video_feed }}</p>
-	
-</div>
-
 <div class="top-right-logo">
   <a></a>Raspberry Pi - Camera Stream</a>
 </div>
+
+<div class="main" id="newpost">
+<img  class="camera-bg" style="width: 100%; height:80%; background-attachment: fixed;" id="bg" class="center" src="{{ url_for('video_feed') }}">
+	
+</div>
+
 
 </body>
 </html>
