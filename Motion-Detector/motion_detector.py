@@ -15,7 +15,9 @@ FRAMES_TO_PERSIST = 10
 
 # Minimum boxed area for a detected motion to count as actual motion
 # Use to filter out noise or small objects
-MIN_SIZE_FOR_MOVEMENT = 2000
+# Decrease to increase sensitivity, suitable for far range detection
+# Increase 
+MIN_SIZE_FOR_MOVEMENT = 1000
 
 # Minimum length of time where no motion is detected it should take
 #(in program cycles) for the program to declare that there is no movement
@@ -43,6 +45,7 @@ delay_counter = 0
 movement_persistent_counter = 0
 
 def generate_frames():
+    global first_frame, next_frame, delay_counter, movement_persistent_counter
     while True:
         frame = camera.capture_array()
 
@@ -57,7 +60,8 @@ def generate_frames():
         gray = cv2.GaussianBlur(gray, (21, 21), 0)
 
         # If the first frame is nothing, initialise it
-        if first_frame is None: first_frame = gray    
+        if first_frame is None:
+            first_frame = gray    
 
         delay_counter += 1
 
@@ -79,7 +83,7 @@ def generate_frames():
 
         # Fill in holes via dilate(), and find contours of the thesholds
         thresh = cv2.dilate(thresh, None, iterations = 2)
-        _, cnts, _ = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cnts, _ = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         # loop over the contours
         for c in cnts:
@@ -118,16 +122,16 @@ def generate_frames():
 #        cv2.imshow("delta", frame_delta)
         
         # Convert the frame_delta to color for splicing
-        frame_delta = cv2.cvtColor(frame_delta, cv2.COLOR_GRAY2BGR)
-
-        # Splice the two video frames together to make one long horizontal one
-        cv2.imshow("frame", np.hstack((frame_delta, frame)))
-
-
-        # Interrupt trigger by pressing q to quit the open CV program
-        ch = cv2.waitKey(1)
-        if ch & 0xFF == ord('q'):
-            break
+#        frame_delta = cv2.cvtColor(frame_delta, cv2.COLOR_GRAY2BGR)
+#
+#        # Splice the two video frames together to make one long horizontal one
+#        cv2.imshow("frame", np.hstack((frame_delta, frame)))
+#
+#
+#        # Interrupt trigger by pressing q to quit the open CV program
+#        ch = cv2.waitKey(1)
+#        if ch & 0xFF == ord('q'):
+#            break
         
         # Encode frame as JPEG
         ret, buffer = cv2.imencode('.jpg', frame)
