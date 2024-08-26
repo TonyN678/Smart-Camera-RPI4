@@ -2,7 +2,6 @@ from flask import Flask, Response, render_template
 from picamera2 import Picamera2
 import cv2
 from libcamera import Transform
-import numpy as np
 
 # Parameters
 id = 0
