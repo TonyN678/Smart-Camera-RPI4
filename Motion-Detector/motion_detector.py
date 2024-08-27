@@ -16,7 +16,7 @@ FRAMES_TO_PERSIST = 10
 # Minimum boxed area for a detected motion to count as actual motion
 # Use to filter out noise or small objects
 # Decrease to increase sensitivity, suitable for far range detection
-# Increase 
+# Increase to detect short-range target
 MIN_SIZE_FOR_MOVEMENT = 1000
 
 # Minimum length of time where no motion is detected it should take
@@ -45,8 +45,11 @@ delay_counter = 0
 movement_persistent_counter = 0
 
 def generate_frames():
+    # Declare these variables as Global to avoid UnboundLocalError
     global first_frame, next_frame, delay_counter, movement_persistent_counter
+
     while True:
+        # Output frame(or picture) from Pi Camera to variable frame
         frame = camera.capture_array()
 
         # Set transient motion detected as false
@@ -126,12 +129,12 @@ def generate_frames():
 #
 #        # Splice the two video frames together to make one long horizontal one
 #        cv2.imshow("frame", np.hstack((frame_delta, frame)))
-#
-#
-#        # Interrupt trigger by pressing q to quit the open CV program
-#        ch = cv2.waitKey(1)
-#        if ch & 0xFF == ord('q'):
-#            break
+
+
+        # Interrupt trigger by pressing q to quit the open CV program
+        ch = cv2.waitKey(1)
+        if ch & 0xFF == ord('q'):
+            break
         
         # Encode frame as JPEG
         ret, buffer = cv2.imencode('.jpg', frame)
