@@ -21,7 +21,7 @@ MIN_SIZE_FOR_MOVEMENT = 1000
 
 # Minimum length of time where no motion is detected it should take
 #(in program cycles) for the program to declare that there is no movement
-MOVEMENT_DETECTED_PERSISTENCE = 100
+MOVEMENT_DETECTED_PERSISTENCE = 50
 
 # =============================================================================
 # CORE PROGRAM
@@ -116,6 +116,8 @@ def generate_frames():
         else:
             text = "No Movement Detected"
 
+        print(text)
+
         # Print the text on the screen, and display the raw and processed video 
         # feeds
         cv2.putText(frame, str(text), (10,35), font, 0.75, (255,255,255), 2, cv2.LINE_AA)
@@ -143,9 +145,9 @@ def generate_frames():
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-#@app.route('/')
-#def video_feed():
-#    return render_template('index.html')
+@app.route('/')
+def video_feed():
+    return render_template('index.html')
 
 @app.route('/video_feed')
 def page_video():
