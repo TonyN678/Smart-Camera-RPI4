@@ -17,7 +17,7 @@ FRAMES_TO_PERSIST = 10
 # Use to filter out noise or small objects
 # Decrease to increase sensitivity, suitable for far range detection
 # Increase to detect short-range target
-MIN_SIZE_FOR_MOVEMENT = 1000
+MIN_SIZE_FOR_MOVEMENT = 25000
 
 # Minimum length of time where no motion is detected it should take
 #(in program cycles) for the program to declare that there is no movement
@@ -90,7 +90,7 @@ def generate_frames():
 
         # loop over the contours
         for c in cnts:
-
+            global x, y, w, h
             # Save the coordinates of all found contours
             (x, y, w, h) = cv2.boundingRect(c)
             
@@ -101,6 +101,8 @@ def generate_frames():
                 
                 # Draw a rectangle around big enough movements
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                
+                print(f"Coordinate: ({x},{y})")
 
         # The moment something moves momentarily, reset the persistent
         # movement timer.
@@ -116,7 +118,6 @@ def generate_frames():
         else:
             text = "No Movement Detected"
 
-        print(text)
 
         # Print the text on the screen, and display the raw and processed video 
         # feeds
