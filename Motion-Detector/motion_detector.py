@@ -4,6 +4,7 @@ import cv2
 from libcamera import Transform
 import numpy as np
 import imutils
+from datetime import datetime
 
 # =============================================================================
 # USER-SET PARAMETERS
@@ -16,13 +17,16 @@ FRAMES_TO_PERSIST = 10
 # Minimum boxed area for a detected motion to count as actual motion
 # Use to filter out noise or small objects
 # Decrease to increase sensitivity, suitable for far range detection
-# Increase to detect short-range target
-MIN_SIZE_FOR_MOVEMENT = 25000
+# Increase to detect short-range target(25000)
+MIN_SIZE_FOR_MOVEMENT = 10000 
 
 # Minimum length of time where no motion is detected it should take
 #(in program cycles) for the program to declare that there is no movement
 MOVEMENT_DETECTED_PERSISTENCE = 50
 
+# Number of detection before declaring there is an actual movement,
+# not external impacts like sunslight or thing falling down
+COUNT_THRESHOLD_DETECTION = 30
 # =============================================================================
 # CORE PROGRAM
 # ===============================================================
@@ -43,10 +47,11 @@ next_frame = None
 font = cv2.FONT_HERSHEY_SIMPLEX
 delay_counter = 0
 movement_persistent_counter = 0
+count = 0
 
 def generate_frames():
     # Declare these variables as Global to avoid UnboundLocalError
-    global first_frame, next_frame, delay_counter, movement_persistent_counter
+    global count, first_frame, next_frame, delay_counter, movement_persistent_counter
 
     while True:
         # Output frame(or picture) from Pi Camera to variable frame
@@ -102,58 +107,53 @@ def generate_frames():
                 # Draw a rectangle around big enough movements
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
                 
-                print(f"Coordinate: ({x},{y})")
+                #print(f"Coordinate: ({x},{y})")
 
         # The moment something moves momentarily, reset the persistent
         # movement timer.
         if transient_movement_flag == True:
             movement_persistent_flag = True
             movement_persistent_counter = MOVEMENT_DETECTED_PERSISTENCE
+            # Count how many movement detected(MOVEMENT_DETECTED_PERSISTENCE be returned)
+            count += 1
+            if count > COUNT_THRESHOLD_DETECTION:
+                print("Detected Motion")
+                count = 0
 
         # As long as there was a recent transient movement, say a movement
         # was detected    
         if movement_persistent_counter > 0:
             text = "Movement Detected " + str(movement_persistent_counter)
+
+            # Save photos
+            #today_date = datetime.now().strftime("%m%d%Y-%H%M%S") # get current time
+            #cv.imwrite(str("StreamPhoto" + "_" + today_date + ".jpg"), frame)
+        
             movement_persistent_counter -= 1
         else:
             text = "No Movement Detected"
 
-
-        # Print the text on the screen, and display the raw and processed video 
-        # feeds
+        # Print the text on the screen, include datetime and movement status
         cv2.putText(frame, str(text), (10,35), font, 0.75, (255,255,255), 2, cv2.LINE_AA)
-        
-        # For if you want to show the individual video frames
-#        cv2.imshow("frame", frame)
-#        cv2.imshow("delta", frame_delta)
-        
-        # Convert the frame_delta to color for splicing
-#        frame_delta = cv2.cvtColor(frame_delta, cv2.COLOR_GRAY2BGR)
-#
-#        # Splice the two video frames together to make one long horizontal one
-#        cv2.imshow("frame", np.hstack((frame_delta, frame)))
-
-
-        # Interrupt trigger by pressing q to quit the open CV program
-        ch = cv2.waitKey(1)
-        if ch & 0xFF == ord('q'):
-            break
+        cv2.putText(frame, datetime.now().strftime("%d/%m/%Y, %H:%M:%S"), (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.40, (0, 0, 255), 1)      
         
         # Encode frame as JPEG
         ret, buffer = cv2.imencode('.jpg', frame)
+        
         frame = buffer.tobytes()
-       # Use yield to create a generator
+        # Use yield to create a generator
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+    
 
 @app.route('/')
-def video_feed():
+def index():
     return render_template('index.html')
 
 @app.route('/video_feed')
-def page_video():
+def video_feed():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port="5000")
 
