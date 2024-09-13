@@ -5,6 +5,7 @@ from libcamera import Transform
 import numpy as np
 import imutils
 from datetime import datetime
+import mail_notif
 
 # =============================================================================
 # USER-SET PARAMETERS
@@ -27,6 +28,7 @@ MOVEMENT_DETECTED_PERSISTENCE = 50
 # Number of detection before declaring there is an actual movement,
 # not external impacts like sunslight or thing falling down
 COUNT_THRESHOLD_DETECTION = 30
+
 # =============================================================================
 # CORE PROGRAM
 # ===============================================================
@@ -135,7 +137,7 @@ def generate_frames():
 
         # Print the text on the screen, include datetime and movement status
         cv2.putText(frame, str(text), (10,35), font, 0.75, (255,255,255), 2, cv2.LINE_AA)
-        cv2.putText(frame, datetime.now().strftime("%d/%m/%Y, %H:%M:%S"), (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.40, (0, 0, 255), 1)      
+        cv2.putText(frame, datetime.now().strftime("%d/%m/%Y, %H:%M:%S"), (10, frame.shape[0] - 10), font, 0.50, (0, 0, 255), 1)      
         
         # Encode frame as JPEG
         ret, buffer = cv2.imencode('.jpg', frame)

@@ -57,4 +57,3 @@ def envoie_mail(nb_people_max: int, table_photo: list):
     server.quit()
 
 
-envoie_mail(1, )

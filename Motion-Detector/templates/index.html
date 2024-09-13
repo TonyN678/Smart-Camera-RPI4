@@ -1,9 +1,84 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <title>Raspberry Pi Live Video Feed</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Stream</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+        color: #f3f3f3;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        min-height: 100vh;
+      }
+      header {
+        width: 100%;
+        padding: 20px 0;
+        text-align: center;
+      }
+      h1 {
+        font-size: 2em;
+        color: #fff;
+        margin: 0;
+        text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+      }
+      img {
+        border: 3px solid rgba(255, 255, 255, 0.8);
+        border-radius: 10px;
+        max-width: 90%;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      }
+      .container {
+        text-align: center;
+        padding: 30px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        width: 80%;
+        max-width: 900px;
+      }
+      footer {
+        margin-top: 20px;
+        padding: 20px;
+        font-size: 0.9em;
+        color: #ddd;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.05);
+        width: 100%;
+      }
+
+      footer p {
+        color: #e0f7fa;
+        margin: 10px 0;
+      }
+      footer a {
+        color: #ffcccb;
+        text-decoration: underline;
+        font-weight: bold;
+      }
+      footer a:hover {
+        text-decoration: none;
+      }    
+</style>
   </head>
   <body>
-    <h1>Raspberry Pi Live Video Feed</h1>
-    <img id="bg" src="{{ url_for('video_feed') }}">
+    <header>
+      <h1>Video Stream</h1>
+    </header>
+    <div class="container">
+      <img src="{{ url_for('video_feed') }}" alt="Live Video Feed">
+    </div>
+    <footer>
+      <p>This is a security camera streaming system, built with Raspberry Pi 4 and Pi Camera 2 along with some other components. You can check out the source code and futher details in the link below!</p>
+      <p><a href="https://github.com/TonyN678/Smart-Camera-RPI4">Visit my GitHub Repo here :)</a></p>
+      &copy; 2024 Smart Camera - Tien Nguyen.
+    </footer>
   </body>
 </html>
