@@ -50,10 +50,12 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 delay_counter = 0
 movement_persistent_counter = 0
 count = 0
+photo_number = 3
+stream_photo_list = []   
 
 def generate_frames():
     # Declare these variables as Global to avoid UnboundLocalError
-    global count, first_frame, next_frame, delay_counter, movement_persistent_counter
+    global count, first_frame, next_frame, delay_counter, movement_persistent_counter, photo_number, stream_photo_list
 
     while True:
         # Output frame(or picture) from Pi Camera to variable frame
@@ -116,20 +118,28 @@ def generate_frames():
         if transient_movement_flag == True:
             movement_persistent_flag = True
             movement_persistent_counter = MOVEMENT_DETECTED_PERSISTENCE
-            # Count how many movement detected(MOVEMENT_DETECTED_PERSISTENCE be returned)
+            
+            # number of movement observed before declaring there is actual movement
             count += 1
-            if count > COUNT_THRESHOLD_DETECTION:
+            if count > COUNT_THRESHOLD_DETECTION and photo_number >0:
+                # Save photos and save it to a list
+                camera.capture_file(f"/tmp/StreamPhoto{photo_number}.jpg")
+                stream_photo_list.append(f"/tmp/StreamPhoto{photo_number}.jpg")
                 print("Detected Motion")
                 count = 0
+                photo_number -= 1
+
+            elif photo_number == 0:
+                # send email to notify of movements
+                mail_notif.envoie_mail(1, stream_photo_list)
+                stream_photo_list.clear()
+                photo_number = 3
 
         # As long as there was a recent transient movement, say a movement
         # was detected    
         if movement_persistent_counter > 0:
             text = "Movement Detected " + str(movement_persistent_counter)
 
-            # Save photos
-            #today_date = datetime.now().strftime("%m%d%Y-%H%M%S") # get current time
-            #cv.imwrite(str("StreamPhoto" + "_" + today_date + ".jpg"), frame)
         
             movement_persistent_counter -= 1
         else:
