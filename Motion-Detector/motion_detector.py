@@ -19,7 +19,7 @@ FRAMES_TO_PERSIST = 10
 # Use to filter out noise or small objects
 # Decrease to increase sensitivity, suitable for far range detection
 # Increase to detect short-range target(25000)
-MIN_SIZE_FOR_MOVEMENT = 10000 
+MIN_SIZE_FOR_MOVEMENT = 25000 
 
 # Minimum length of time where no motion is detected it should take
 #(in program cycles) for the program to declare that there is no movement
@@ -29,6 +29,8 @@ MOVEMENT_DETECTED_PERSISTENCE = 50
 # not external impacts like sunslight or thing falling down
 COUNT_THRESHOLD_DETECTION = 30
 
+# Number of photos sent through gmail for notification
+PHOTO_NUMBER_SENT = 3
 # =============================================================================
 # CORE PROGRAM
 # ===============================================================
@@ -50,7 +52,7 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 delay_counter = 0
 movement_persistent_counter = 0
 count = 0
-photo_number = 3
+photo_number = PHOTO_NUMBER_SENT
 stream_photo_list = []   
 
 def generate_frames():
@@ -99,7 +101,7 @@ def generate_frames():
 
         # loop over the contours
         for c in cnts:
-            global x, y, w, h
+            global x, y, w, h, coordinate
             # Save the coordinates of all found contours
             (x, y, w, h) = cv2.boundingRect(c)
             
@@ -111,7 +113,9 @@ def generate_frames():
                 # Draw a rectangle around big enough movements
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
                 
-                #print(f"Coordinate: ({x},{y})")
+                # print coordinate of movement to screen
+                coordinate = f"({x},{y})"
+                cv2.putText(frame, coordinate, (10,80), font, 0.75, (0,0,255), 2, cv2.LINE_AA)
 
         # The moment something moves momentarily, reset the persistent
         # movement timer.
@@ -133,14 +137,15 @@ def generate_frames():
                 # send email to notify of movements
                 mail_notif.envoie_mail(1, stream_photo_list)
                 stream_photo_list.clear()
-                photo_number = 3
+                photo_number = PHOTO_NUMBER_SENT
+            
+            else:
+                pass
 
         # As long as there was a recent transient movement, say a movement
         # was detected    
         if movement_persistent_counter > 0:
             text = "Movement Detected " + str(movement_persistent_counter)
-
-        
             movement_persistent_counter -= 1
         else:
             text = "No Movement Detected"
