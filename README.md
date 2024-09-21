@@ -1,9 +1,8 @@
 <h1 style="text-align: center;">Smart Camera with RPi4</h1>
 
-<div style="display: flex; justify-content: center; align-items: center;">
-  <img src="image1.jpg" alt="Image 1" style="margin-right: 10px;">
-  <img src="image2.jpg" alt="Image 2">
-</div>
+<img src="image1.jpg" alt="Image 1">
+<img src="image2.jpg" alt="Image 2">
+<img src="image3.jpg" alt="Image 3">
 
 <h2>Smart Camera System Overview</h2>
 <p>
